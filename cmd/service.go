@@ -125,6 +125,8 @@ var newTag string
 var register bool
 var deregister bool
 var path string
+var healthcheck string
+var healthcheckInterval string = "15s"
 var srvDef = &ServiceDef{}
 
 
@@ -177,6 +179,9 @@ func init() {
 	serviceCmd.Flags().StringVarP(&newTag, "add-tag", "", "",
 		"Add a new tag to your consul service")
 
+	serviceCmd.Flags().StringVarP(&healthcheck, "health-check", "", "",
+		"Set a URL for health checking")
+
 	serviceCmd.Flags().BoolVarP(&register, "register", "", false,
 		"Register the service with Consul")
 
@@ -214,6 +219,15 @@ func serviceAction(cmd *cobra.Command, args []string) {
 		if !exists {
 			srvDef.Tags = append(srvDef.Tags, newTag)
 		}
+	}
+
+	if srvDef.Check == nil && healthcheck + healthcheckInterval != "" {
+		srvDef.Check = &ConsulCheck{}
+	}
+
+	if healthcheck != "" {
+		srvDef.Check.HTTP = healthcheck
+		srvDef.Check.Interval = healthcheckInterval
 	}
 
 
