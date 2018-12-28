@@ -34,6 +34,7 @@ type ConsulCheck struct {
 	Method string `json:"method,omitempty"`
 	Timeout string `json:"timeout,omitempty"`
 	Args []string `json:"args,omitempty"`
+	DeregisterCriticalSrvAfter string `json:"deregistercriticalserviceafter,omitempty"`
 }
 type ConsulWeights struct {
 	Passing int `json:"passing"`
@@ -226,8 +227,12 @@ func serviceAction(cmd *cobra.Command, args []string) {
 	}
 
 	if healthcheck != "" {
-		srvDef.Check.HTTP = healthcheck
+		srvDef.Check.Args = []string{
+			"sh", "-c",
+			"curl", "-o /dev/null", "--fail", "-s", healthcheck, // healthcheck==url
+		}
 		srvDef.Check.Interval = healthcheckInterval
+		srvDef.Check.DeregisterCriticalSrvAfter = "1m"
 	}
 
 

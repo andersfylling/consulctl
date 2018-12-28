@@ -3,4 +3,4 @@ version: '3'
 services:
   consulctl:
     build: .
-    image: andersfylling/consulctl:v0.3.0
+    image: andersfylling/consulctl:v1.3.0
